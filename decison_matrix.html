@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urgency & Decision-Making Evaluator</title>
+<style>
+
+        :root {
+
+            --bg-primary: #f8fafc;
+
+            --card-bg: #ffffff;
+
+            --text-main: #1e293b;
+
+            --text-muted: #64748b;
+
+            --border-color: #e2e8f0;
+
+            --primary-blue: #2563eb;
+
+            --choice-a: #10b981;
+
+            --choice-b: #f59e0b;
+
+            --choice-c: #ef4444;
+
+        }
+ 
+        body {
+
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+            background-color: var(--bg-primary);
+
+            color: var(--text-main);
+
+            margin: 0;
+
+            padding: 24px;
+
+            display: flex;
+
+            justify-content: center;
+
+        }
+ 
+        .container {
+
+            width: 100%;
+
+            max-width: 680px;
+
+            background: var(--card-bg);
+
+            border-radius: 12px;
+
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+            border: 1px solid var(--border-color);
+
+            padding: 32px;
+
+        }
+ 
+        h1 {
+
+            font-size: 24px;
+
+            margin-top: 0;
+
+            margin-bottom: 8px;
+
+            color: #0f172a;
+
+        }
+ 
+        .subtitle {
+
+            font-size: 14px;
+
+            color: var(--text-muted);
+
+            margin-bottom: 28px;
+
+            border-bottom: 2px solid var(--border-color);
+
+            padding-bottom: 16px;
+
+        }
+ 
+        .question-card {
+
+            background: #f1f5f9;
+
+            border-radius: 8px;
+
+            padding: 16px;
+
+            margin-bottom: 16px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+        }
+ 
+        .question-text {
+
+            font-weight: 600;
+
+            font-size: 15px;
+
+        }
+ 
+        .question-desc {
+
+            font-size: 13px;
+
+            color: var(--text-muted);
+
+            margin-top: -8px;
+
+        }
+ 
+        .btn-group {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+ 
+        .toggle-btn {
+
+            flex: 1;
+
+            padding: 10px;
+
+            border: 1px solid #cbd5e1;
+
+            background: #ffffff;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: 500;
+
+            font-size: 14px;
+
+            transition: all 0.2s ease;
+
+        }
+ 
+        .toggle-btn:hover {
+
+            background: #f8fafc;
+
+        }
+ 
+        /* Active Button States */
+
+        .toggle-btn.active-yes {
+
+            background: var(--primary-blue);
+
+            color: white;
+
+            border-color: var(--primary-blue);
+
+        }
+ 
+        .toggle-btn.active-no {
+
+            background: #475569;
+
+            color: white;
+
+            border-color: #475569;
+
+        }
+ 
+        .matrix-output {
+
+            margin-top: 28px;
+
+            border-radius: 8px;
+
+            padding: 20px;
+
+            display: none;
+
+            animation: fadeIn 0.3s ease;
+
+        }
+ 
+        @keyframes fadeIn {
+
+            from { opacity: 0; transform: translateY(4px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+ 
+        .output-title {
+
+            font-weight: 700;
+
+            font-size: 18px;
+
+            margin-bottom: 8px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+ 
+        .output-justification, .output-action {
+
+            font-size: 14px;
+
+            margin-top: 8px;
+
+            line-height: 1.5;
+
+        }
+ 
+        .output-action strong {
+
+            display: block;
+
+            margin-top: 12px;
+
+            font-size: 13px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
+        }
+ 
+        /* Color profiles for results */
+
+        .status-a { background: #ecfdf5; border-left: 6px solid var(--choice-a); color: #065f46; }
+
+        .status-a .output-title { color: var(--choice-a); }
+
+        .status-b { background: #fffbeb; border-left: 6px solid var(--choice-b); color: #92400e; }
+
+        .status-b .output-title { color: var(--choice-b); }
+ 
+        .status-c { background: #fef2f2; border-left: 6px solid var(--choice-c); color: #991b1b; }
+
+        .status-c .output-title { color: var(--choice-c); }
+</style>
+</head>
+<body>
+ 
+<div class="container">
+<h1>⚡ Triage Matrix Evaluator</h1>
+<div class="subtitle">Select clickable variables below to dynamically parse operational pathways.</div>
+ 
+    <!-- Question 1 -->
+<div class="question-card">
+<div class="question-text">1. System or Company Error?</div>
+<div class="question-desc">Did an internal operational failure or system glitch create the issue?</div>
+<div class="btn-group">
+<button class="toggle-btn" onclick="setAnswer(1, true, this)">Yes</button>
+<button class="toggle-btn" onclick="setAnswer(1, false, this)">No</button>
+</div>
+</div>
+ 
+    <!-- Question 2 -->
+<div class="question-card">
+<div class="question-text">2. Immediate Negative Impact?</div>
+<div class="question-desc">Will the passenger experience critical financial/safety risks if unacted upon now?</div>
+<div class="btn-group">
+<button class="toggle-btn" onclick="setAnswer(2, true, this)">Yes</button>
+<button class="toggle-btn" onclick="setAnswer(2, false, this)">No</button>
+</div>
+</div>
+ 
+    <!-- Question 3 -->
+<div class="question-card">
+<div class="question-text">3. Baseline Details Verifiable?</div>
+<div class="question-desc">Are core data markers present right now inside SF or Amadeus/ARD records?</div>
+<div class="btn-group">
+<button class="toggle-btn" onclick="setAnswer(3, true, this)">Yes</button>
+<button class="toggle-btn" onclick="setAnswer(3, false, this)">No</button>
+</div>
+</div>
+ 
+    <!-- Dynamic Output Area -->
+<div id="outputBlock" class="matrix-output">
+<div id="outTitle" class="output-title"></div>
+<div id="outJustify" class="output-justification"></div>
+<div id="outAction" class="output-action"></div>
+</div>
+</div>
+ 
+<script>
+
+    // State tracker object
+
+    const state = { q1: null, q2: null, q3: null };
+ 
+    function setAnswer(questionNum, value, element) {
+
+        // Clear previous active states in the target row block
+
+        const buttons = element.parentElement.querySelectorAll('.toggle-btn');
+
+        buttons.forEach(btn => btn.classList.remove('active-yes', 'active-no'));
+ 
+        // Assign visual designator layout to selected option
+
+        if(value) {
+
+            element.classList.add('active-yes');
+
+        } else {
+
+            element.classList.add('active-no');
+
+        }
+ 
+        // Commit input into state
+
+        state[`q1${questionNum}`.replace('1','')] = value;
+ 
+        calculateMatrix();
+
+    }
+ 
+    function calculateMatrix() {
+
+        // Halt if user hasn't toggled all selections yet
+
+        if (state.q1 === null || state.q2 === null || state.q3 === null) return;
+ 
+        const outputBlock = document.getElementById('outputBlock');
+
+        const title = document.getElementById('outTitle');
+
+        const justify = document.getElementById('outJustify');
+
+        const action = document.getElementById('outAction');
+ 
+        // Reset styling footprint
+
+        outputBlock.className = 'matrix-output';
+
+        outputBlock.style.display = 'block';
+ 
+        // Core Matrix Evaluation Trees
+
+        if (state.q1 === true && state.q2 === true && state.q3 === true) {
+
+            // Choice A
+
+            outputBlock.classList.add('status-a');
+
+            title.innerHTML = '🟢 CHOICE A: Approve Request Immediately';
+
+            justify.innerHTML = '<strong>Justification:</strong> The issue was explicitly company-caused, immediate negative impact is verified, and data records are visible in core architecture maps.';
+
+            action.innerHTML = '<strong>Required Action:</strong> Authorize waivers, full routing changes, or active manual ledger compensation values directly on the spot.';
+
+        } 
+
+        else if (state.q3 === true && (state.q1 === false || state.q2 === false)) {
+
+            // Choice B
+
+            outputBlock.classList.add('status-b');
+
+            title.innerHTML = '🟡 CHOICE B: Escalate Digitally or Special Exception';
+
+            justify.innerHTML = '<strong>Justification:</strong> Urgency thresholds are high and records are legitimate, but core elements fall outside standard operational parameters or structural compliance boundaries.';
+
+            action.innerHTML = '<strong>Required Action:</strong> Immediately bridge line communications to active Duty Managers or Supervision vectors. Monitor real-time logs until a sign-off or exemption tag is appended.';
+
+        } 
+
+        else {
+
+            // Choice C
+
+            outputBlock.classList.add('status-c');
+
+            title.innerHTML = '🔴 CHOICE C: Deny Request & Pivot to Alternative';
+
+            justify.innerHTML = '<strong>Justification:</strong> The breakdown event is isolated to user-error or core transactional records are fundamentally unverified inside internal environments.';
+
+            action.innerHTML = '<strong>Required Action:</strong> Issue formal notification of request denial without delay. Explicitly frame systemic context constraints and pivot structural messaging toward secondary paid choices.';
+
+        }
+
+    }
+</script>
+ 
+</body>
+</html>
+ 
